@@ -10,7 +10,7 @@ defmodule Pigpiox.Supervisor do
   @spec init(:ok) :: {:ok, {:supervisor.sup_flags, [:supervisor.child_spec]}}
   def init(:ok) do
     children = [
-      {Pigpiox.Port, [name: Pigpiox.Port]},
+      # {Pigpiox.Port, [name: Pigpiox.Port]},
       {Pigpiox.Socket, [name: Pigpiox.Socket]},
       {Pigpiox.GPIO.WatcherSupervisor, []}
     ]
