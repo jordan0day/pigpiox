@@ -105,6 +105,16 @@ defmodule Pigpiox.Waveform do
   end
 
   @doc """
+  Sends a waveform once, by its id, attempting to sync with the previous wave.
+
+  Returns the number of DMA control blocks used in the waveform.
+  """
+  @spec send_sync(non_neg_integer) :: {:ok, non_neg_integer} | {:error, atom}
+  def send_sync(wave_id) do
+    Pigpiox.Socket.command(:waveform_transmit_mod, wave_id, 2)
+  end
+
+  @doc """
   Starts a repeating waveform, by its id.
 
   Returns the number of DMA control blocks used in the waveform.
