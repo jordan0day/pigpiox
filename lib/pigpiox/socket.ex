@@ -95,7 +95,7 @@ defmodule Pigpiox.Socket do
         {:ok, socket}
 
       {:error, _} ->
-        Process.sleep(2000)
+        Process.sleep(2_000)
         attempt_connection(num_retries - 1)
     end
   end
