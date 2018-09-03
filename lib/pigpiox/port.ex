@@ -24,19 +24,19 @@ defmodule Pigpiox.Port do
 
   @spec start_pigpiod() :: port()
   defp start_pigpiod do
-    _ = Logger.debug "Pigpiox.Port: starting pigpiod"
+    _ = Logger.debug("Pigpiox.Port: starting pigpiod")
     path = System.find_executable("pigpiod")
     Port.open({:spawn_executable, path}, [:binary, :exit_status, args: ["-g", "-x", "-1"]])
   end
 
   def handle_info({_, {:exit_status, _}}, _) do
-    _ = Logger.debug "Pigpiox.Port: pigpiod exited"
+    _ = Logger.debug("Pigpiox.Port: pigpiod exited")
     port = start_pigpiod()
     {:noreply, port}
   end
 
   def handle_info(msg, state) do
-    _ = Logger.debug "Pigpiox.Port: #{inspect msg}"
+    _ = Logger.debug(fn -> "Pigpiox.Port: #{inspect(msg)}" end)
     {:noreply, state}
   end
 end

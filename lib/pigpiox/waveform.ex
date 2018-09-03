@@ -1,6 +1,8 @@
 defmodule Pigpiox.Waveform do
   use Bitwise
 
+  alias Pigpiox.Socket
+
   @moduledoc """
   Build and send waveforms with pigpiod.
   """
@@ -9,8 +11,8 @@ defmodule Pigpiox.Waveform do
   Clears all waveforms and any data added.
   """
   @spec clear_all() :: :ok | {:error, atom}
-  def clear_all()  do
-    case Pigpiox.Socket.command(:waveform_clear_all) do
+  def clear_all do
+    case Socket.command(:waveform_clear_all) do
       {:ok, _} -> :ok
       error -> error
     end
@@ -36,10 +38,12 @@ defmodule Pigpiox.Waveform do
   """
   @spec add_generic(pulses :: list(pulse)) :: {:ok, non_neg_integer} | {:error, atom}
   def add_generic(pulses) do
-    extents = Enum.flat_map pulses, fn pulse ->
-      [mask(pulse.gpio_on), mask(pulse.gpio_off), pulse.delay]
-    end
-    Pigpiox.Socket.command(:waveform_add_generic, 0, 0, extents)
+    extents =
+      Enum.flat_map(pulses, fn pulse ->
+        [mask(pulse.gpio_on), mask(pulse.gpio_off), pulse.delay]
+      end)
+
+    Socket.command(:waveform_add_generic, 0, 0, extents)
   end
 
   @doc """
@@ -48,8 +52,8 @@ defmodule Pigpiox.Waveform do
   Returns the id of the newly created waveform or an error
   """
   @spec create() :: {:ok, non_neg_integer} | {:error, atom}
-  def create() do
-    Pigpiox.Socket.command(:waveform_create)
+  def create do
+    Socket.command(:waveform_create)
   end
 
   @doc """
@@ -57,7 +61,7 @@ defmodule Pigpiox.Waveform do
   """
   @spec delete(non_neg_integer) :: :ok | {:error, atom}
   def delete(wave_id) do
-    case Pigpiox.Socket.command(:waveform_delete, wave_id) do
+    case Socket.command(:waveform_delete, wave_id) do
       {:ok, _} -> :ok
       error -> error
     end
@@ -67,16 +71,16 @@ defmodule Pigpiox.Waveform do
   Returns the id of the currently transmitted waveform.
   """
   @spec current() :: {:ok, non_neg_integer} | {:error, atom}
-  def current() do
-    Pigpiox.Socket.command(:waveform_current)
+  def current do
+    Socket.command(:waveform_current)
   end
 
   @doc """
   Returns whether or not a waveform is currently being transmitted.
   """
   @spec busy?() :: {:ok, boolean} | {:error, atom}
-  def busy?() do
-    case Pigpiox.Socket.command(:waveform_busy) do
+  def busy? do
+    case Socket.command(:waveform_busy) do
       {:ok, 1} -> {:ok, true}
       {:ok, _} -> {:ok, false}
       error -> error
@@ -87,8 +91,8 @@ defmodule Pigpiox.Waveform do
   Stops a waveform that is currently being transmitted.
   """
   @spec stop() :: :ok | {:error, atom}
-  def stop() do
-    case Pigpiox.Socket.command(:waveform_stop) do
+  def stop do
+    case Socket.command(:waveform_stop) do
       {:ok, _} -> :ok
       error -> error
     end
@@ -101,7 +105,7 @@ defmodule Pigpiox.Waveform do
   """
   @spec send(non_neg_integer) :: {:ok, non_neg_integer} | {:error, atom}
   def send(wave_id) do
-    Pigpiox.Socket.command(:waveform_transmit_once, wave_id)
+    Socket.command(:waveform_transmit_once, wave_id)
   end
 
   @doc """
@@ -111,7 +115,7 @@ defmodule Pigpiox.Waveform do
   """
   @spec send_sync(non_neg_integer) :: {:ok, non_neg_integer} | {:error, atom}
   def send_sync(wave_id) do
-    Pigpiox.Socket.command(:waveform_transmit_mod, wave_id, 2)
+    Socket.command(:waveform_transmit_mod, wave_id, 2)
   end
 
   @doc """
@@ -121,7 +125,7 @@ defmodule Pigpiox.Waveform do
   """
   @spec repeat(non_neg_integer) :: {:ok, non_neg_integer} | {:error, atom}
   def repeat(wave_id) do
-    Pigpiox.Socket.command(:waveform_transmit_repeat, wave_id)
+    Socket.command(:waveform_transmit_repeat, wave_id)
   end
 
   @doc """
@@ -134,59 +138,60 @@ defmodule Pigpiox.Waveform do
   """
   @spec repeat_sync(non_neg_integer) :: {:ok, non_neg_integer} | {:error, atom}
   def repeat_sync(wave_id) do
-    Pigpiox.Socket.command(:waveform_transmit_mode, wave_id, 3)
+    Socket.command(:waveform_transmit_mode, wave_id, 3)
   end
 
   @doc """
   Returns the length in microseconds of the current waveform.
   """
   @spec get_micros() :: {:ok, non_neg_integer} | {:error, atom}
-  def get_micros() do
-    Pigpiox.Socket.command(:waveform_get_micros)
+  def get_micros do
+    Socket.command(:waveform_get_micros)
   end
 
   @doc """
   Returns the maximum possible size of a waveform in microseconds.
   """
   @spec get_max_micros() :: {:ok, non_neg_integer} | {:error, atom}
-  def get_max_micros() do
-    Pigpiox.Socket.command(:waveform_get_micros, 2)
+  def get_max_micros do
+    Socket.command(:waveform_get_micros, 2)
   end
 
   @doc """
   Returns the length in pulses of the current waveform.
   """
   @spec get_pulses() :: {:ok, non_neg_integer} | {:error, atom}
-  def get_pulses() do
-    Pigpiox.Socket.command(:waveform_get_pulses)
+  def get_pulses do
+    Socket.command(:waveform_get_pulses)
   end
 
   @doc """
   Returns the maximum possible size of a waveform in pulses.
   """
   @spec get_max_pulses() :: {:ok, non_neg_integer} | {:error, atom}
-  def get_max_pulses() do
-    Pigpiox.Socket.command(:waveform_get_pulses, 2)
+  def get_max_pulses do
+    Socket.command(:waveform_get_pulses, 2)
   end
 
   @doc """
   Returns the length in DMA control blocks of the current waveform.
   """
   @spec get_cbs() :: {:ok, non_neg_integer} | {:error, atom}
-  def get_cbs() do
-    Pigpiox.Socket.command(:waveform_get_cbs)
+  def get_cbs do
+    Socket.command(:waveform_get_cbs)
   end
 
   @doc """
   Returns the maximum possible size of a waveform in DMA control blocks.
   """
   @spec get_max_cbs() :: {:ok, non_neg_integer} | {:error, atom}
-  def get_max_cbs() do
-    Pigpiox.Socket.command(:waveform_get_cbs, 2)
+  def get_max_cbs do
+    Socket.command(:waveform_get_cbs, 2)
   end
 
   @spec mask(non_neg_integer) :: non_neg_integer
   defp mask(0), do: 0
+
   defp mask(gpio) do
     1 <<< gpio
   end

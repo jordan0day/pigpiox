@@ -47,7 +47,7 @@ When reading a GPIO, often it's useful to know immediately when its level change
 {:ok, pid} = Pigpiox.GPIO.watch(gpio)
 ```
 
-After setting up a watch on a GPIO pin, the calling process will receive messages of the format `{:gpio_leveL_change, gpio, level}` as its level change.
+After setting up a watch on a GPIO pin, the calling process will receive messages of the format `{:gpio_level_change, gpio, level}` as its level change.
 
 ## Waveforms
 
