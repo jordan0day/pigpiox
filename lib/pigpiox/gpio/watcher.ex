@@ -44,7 +44,7 @@ defmodule Pigpiox.GPIO.Watcher do
 
   @spec handle_info(msg :: tuple, %State{}) ::
           {:noreply, %State{}} | {:stop, :port_exited, %State{}}
-  def handle_info({_, {:data, event}}, state) do
+  def handle_info({_, {:data, <<event::bitstring-size(96)>>}}, state) do
     <<_seqno::native-unsigned-integer-size(16), _flags::native-unsigned-integer-size(16),
       _tick::native-unsigned-integer-size(32),
       gpio_bits::native-unsigned-integer-size(32)>> = event
@@ -63,6 +63,13 @@ defmodule Pigpiox.GPIO.Watcher do
     else
       {:noreply, state}
     end
+  end
+
+  def handle_info({port, {:data, <<event::bitstring-size(96), rest::binary>>}}, state) do
+    send(self(), {port, {:data, event}})
+    send(self(), {port, {:data, rest}})
+
+    {:noreply, state}
   end
 
   def handle_info({_, {:exit_status, _}}, state) do
