@@ -70,6 +70,15 @@ defmodule Pigpiox.GPIO.Watcher do
     {:stop, :port_exited, state}
   end
 
+  def handle_info(msg, state) do
+    _ =
+      Logger.warn(
+        "GPIO.Watcher received unexpected message: #{inspect(msg, pretty: true, limit: 10_000)}"
+      )
+
+    {:noreply, state}
+  end
+
   def terminate(_reason, state) do
     Socket.command(:notify_close, state.handle)
   end

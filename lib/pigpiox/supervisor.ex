@@ -2,7 +2,7 @@ defmodule Pigpiox.Supervisor do
   @moduledoc false
   use Supervisor
 
-  alias Pigpiox.{Socket, Watcher}
+  alias Pigpiox.{Socket, GPIO.Watcher}
 
   @spec start_link :: {:ok, pid} | {:error, term}
   def start_link do
