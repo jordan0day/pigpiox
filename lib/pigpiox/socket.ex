@@ -31,6 +31,11 @@ defmodule Pigpiox.Socket do
     end
   end
 
+  @spec stop(GenServer.server()) :: :ok
+  def stop(server) do
+    GenServer.stop(server)
+  end
+
   @doc """
   Runs a command via pigpiod.
   """
@@ -73,6 +78,16 @@ defmodule Pigpiox.Socket do
     response = handle_result(result)
 
     {:reply, response, socket}
+  end
+
+  def terminate(reason, socket) do
+    _ = Logger.debug("Pigpiox.Socket: shutting down: #{inspect(reason)}")
+
+    if socket != nil do
+      :gen_tcp.close(socket)
+    end
+
+    reason
   end
 
   @spec handle_result(result :: integer) :: command_result
