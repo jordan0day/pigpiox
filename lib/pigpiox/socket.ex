@@ -25,6 +25,8 @@ defmodule Pigpiox.Socket do
 
   @spec init(term) :: {:ok, :gen_tcp.socket()} | {:stop, atom}
   def init(_) do
+    Process.flag(:trap_exit, true)
+
     case attempt_connection(3) do
       {:ok, socket} -> {:ok, socket}
       {:error, reason} -> {:stop, reason}
